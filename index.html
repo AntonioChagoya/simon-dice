@@ -92,6 +92,9 @@
       <div id="verde" class="color verde right" data-color="verde"></div>
       <button id="btnEmpezar" class="btn-start" onclick="empezarJuego()">Empezar a jugar!</button>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js">
+
+    </script>
     <script>
       var btnEmpezar=document.getElementById('btnEmpezar');
       var verde=document.getElementById('verde');
@@ -114,8 +117,7 @@
         iniciar(){
           this.elegirColor= this.elegirColor.bind(this)
           this.sigNivel=this.sigNivel.bind(this)
-          this.iluminarSec();
-          btnEmpezar.classList.add('hide');
+          this.toogleBtnEmpezar()
           this.nivel=1;
           this.colores= {
             celeste,
@@ -135,6 +137,15 @@
           this.agregarEventosClick()
 
         }
+        toogleBtnEmpezar(){
+          if(btnEmpezar.classList.contains('hide')){
+            setTimeout(() => {
+              btnEmpezar.classList.remove('hide')
+            }, 400);
+          } else {
+            btnEmpezar.classList.add('hide')
+          }
+        }
 
         transformarNumColor(num){
           switch(num){
@@ -153,6 +164,10 @@
               }
         }
 
+        iluminarCol(color){
+          this.colores[color].classList.add('light');
+          setTimeout(()=> this.apagarColor(color), 350)
+        }
 
         iluminarSec(){
           for (let i = 0; i < this.nivel; i++) {
@@ -161,10 +176,7 @@
           }
         }
 
-        iluminarCol(color){
-          this.colores[color].classList.add('light');
-          setTimeout(()=> this.apagarColor(color), 350)
-        }
+       
 
         apagarColor(color){
           this.colores[color].classList.remove('light');
@@ -178,15 +190,14 @@
         }
 
         eliminarEventosClick(){
-          this.colores.celeste.removeEventListener('click',this.elegirColor.bind(this))
-          this.colores.verde.removeEventListener('click',this.elegirColor.bind(this))
-          this.colores.violeta.removeEventListener('click',this.elegirColor.bind(this))
-          this.colores.naranja.removeEventListener('click',this.elegirColor.bind(this))
+          this.colores.celeste.removeEventListener('click',this.elegirColor)
+          this.colores.verde.removeEventListener('click',this.elegirColor)
+          this.colores.violeta.removeEventListener('click',this.elegirColor)
+          this.colores.naranja.removeEventListener('click',this.elegirColor)
         }
+        
 
         elegirColor(ev){
-          console.log(this)
-          console.log(ev)
           
           const  nombreColor=ev.target.dataset.color;
           const numeroColor=this.transformarColorNum(nombreColor);
@@ -199,17 +210,29 @@
               this.nivel++
               this.eliminarEventosClick()
               if(this.nivel===(ULTIMO_NIVEL+1)){
-                //gano
+                this.ganoElJuego()
               }else{
                setTimeout( this.sigNivel, 1500)
               }
             }
           } else{
-            //perdio
-            console.log(perdio)
+            this.perdioElJuego()
           }
         }
 
+        ganoElJuego(){
+          swal('Platzi', 'Ganaste!', 'success')
+          .then(this.iniciar.bind(this))
+        
+        }
+        perdioElJuego(){
+          swal('Platzi', 'Perdiste :(', 'error')
+          .then(()=>{
+            this.eliminarEventosClick.bind(this)
+            this.iniciar()
+          })
+        
+        }
       }
         
       function empezarJuego(){
